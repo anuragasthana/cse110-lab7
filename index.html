@@ -86,14 +86,19 @@
       function fetchAll() {
 
         let url = document.getElementById('endpoint').getAttribute('value');
+        let output = document.getElementById('output');
 
         fetch(url)
         .then(function(response){
           response.json().then(function(data){
-            let output = document.getElementById('output');
             output.innerText = JSON.stringify(data);
+          })
+          .catch(function(error){
+            output.innerText = error;
           });
-
+        })
+        .catch(function(error){
+          output.innerText = error;
         });
 
       }
@@ -105,8 +110,9 @@
       function fetchOne() {
 
         let url = document.getElementById('endpoint').getAttribute('value');
-        let id = window.prompt("Enter Record ID:");
         let output = document.getElementById('output');
+        let id = window.prompt("Enter Record ID:");
+        
 
         if(id !== null && parseInt(id) !== NaN){
           fetch(url)
@@ -120,7 +126,13 @@
                 }
               }
 
+            })
+            .catch(function(error){
+              output.innerText = error;
             });
+          })
+          .catch(function(error){
+            output.innerText = error;
           });
         }
 
@@ -132,15 +144,45 @@
       // From the 4 CRUD actions, this is the CREATE action, and uses the POST http method.
       // The main difference from updateRecord() will be the URL you send data to; check
       // the writeup to view the URL pattern for create and update
-      function createRecord() {
-        // TODO
+      function createRecord(option) {
+        if(option == 'show'){
+          document.getElementById('recordForm').style.display = 'block';
+        } else{
+
+          let url = document.getElementById('endpoint').getAttribute('value');
+          let output = document.getElementById('output');
+          let title = document.getElementById('title').value;
+          let author = document.getElementById('author').value;
+
+          let obj = '{ "title" : "' + title + '", "author": "' + author + '"}';
+
+          function json(response){
+            return response.json();
+          }
+
+          fetch(url, {
+            method: 'post',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: obj
+          })
+          .then(json)
+          .then(function(data){
+            output.innerText = JSON.stringify(data);
+          })
+          .catch(function(error){
+            output.innerText = 'Error: ' + error;
+          });
+
+        }
       }
 
       // This function should use fetch to update one existing entry in the given endpoint.
       // From the 4 CRUD actions, this is the UPDATE action, and uses the PUT http method.
       // The main difference from createRecord() will be the URL you send data to; check
       // the writeup to view the URL pattern for create and update
-      function updateRecord() {
+      function updateRecord(option) {
         // TODO
       }
 
