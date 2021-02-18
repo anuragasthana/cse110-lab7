@@ -112,14 +112,16 @@
           fetch(url)
           .then(function(response){
             response.json().then(function(data){
+
               for(let count = 0; count < data.length; ++count){
                 if(data[count].id == parseInt(id)){
                   output.innerText = JSON.stringify(data[count]);
                   return;
                 }
               }
-            })
-          })
+
+            });
+          });
         }
 
         output.innerText = 'Network Error: 404';
