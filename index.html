@@ -84,7 +84,18 @@
       // The main difference from fetchOne() will be the URL you request from; check
       // the writeup to view the URL pattern for fetch one and fetch all
       function fetchAll() {
-        // TODO
+
+        let url = document.getElementById('endpoint').getAttribute('value');
+
+        fetch(url)
+        .then(function(response){
+          response.json().then(function(data){
+            let output = document.getElementById('output');
+            output.innerText = JSON.stringify(data);
+          });
+
+        });
+
       }
 
       // This function should fetch one entry from the given endpoint.
@@ -92,7 +103,27 @@
       // The main difference from fetchAll() will be the URL you request from; check
       // the writeup to view the URL pattern for fetch one and fetch all
       function fetchOne() {
-        // TODO
+
+        let url = document.getElementById('endpoint').getAttribute('value');
+        let id = window.prompt("Enter Record ID:");
+        let output = document.getElementById('output');
+
+        if(id !== null && parseInt(id) !== NaN){
+          fetch(url)
+          .then(function(response){
+            response.json().then(function(data){
+              for(let count = 0; count < data.length; ++count){
+                if(data[count].id == parseInt(id)){
+                  output.innerText = JSON.stringify(data[count]);
+                  return;
+                }
+              }
+            })
+          })
+        }
+
+        output.innerText = 'Network Error: 404';
+
       }
 
       // This function should use fetch to create one entry in the given endpoint.
