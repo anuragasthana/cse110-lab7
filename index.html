@@ -85,6 +85,9 @@
       // the writeup to view the URL pattern for fetch one and fetch all
       function fetchAll() {
 
+        document.getElementById('recordIDcontainer').style.display = 'none';
+        document.getElementById('recordForm').style.display = 'none';
+
         let url = document.getElementById('endpoint').getAttribute('value');
         let output = document.getElementById('output');
 
@@ -108,6 +111,9 @@
       // The main difference from fetchAll() will be the URL you request from; check
       // the writeup to view the URL pattern for fetch one and fetch all
       function fetchOne() {
+
+        document.getElementById('recordIDcontainer').style.display = 'none';
+        document.getElementById('recordForm').style.display = 'none';
 
         let url = document.getElementById('endpoint').getAttribute('value');
         let output = document.getElementById('output');
@@ -146,6 +152,7 @@
       // the writeup to view the URL pattern for create and update
       function createRecord(option) {
         if(option == 'show'){
+          document.getElementById('recordIDcontainer').style.display = 'none';
           document.getElementById('recordForm').style.display = 'block';
         } else{
 
@@ -183,7 +190,40 @@
       // The main difference from createRecord() will be the URL you send data to; check
       // the writeup to view the URL pattern for create and update
       function updateRecord(option) {
-        // TODO
+        if(option == 'show'){
+          document.getElementById('recordForm').style.display = 'block';
+          document.getElementById('recordIDcontainer').style.display = 'block';
+        } else{
+
+          let url = document.getElementById('endpoint').getAttribute('value');
+          let output = document.getElementById('output');
+          let title = document.getElementById('title').value;
+          let author = document.getElementById('author').value;
+          let id = document.getElementById('recordID').value;
+          url = url.toString() + '/' + id;
+
+          let obj = '{ "title" : "' + title + '", "author": "' + author + '"}';
+
+          function json(response){
+            return response.json();
+          }
+
+          fetch(url, {
+            method: 'put',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: obj
+          })
+          .then(json)
+          .then(function(data){
+            output.innerText = JSON.stringify(data);
+          })
+          .catch(function(error){
+            output.innerText = 'Error: ' + error;
+          });
+
+        }
       }
 
       // This function should use fetch to delete one existing entry in the given endpoint.
