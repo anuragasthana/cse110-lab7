@@ -91,18 +91,21 @@
         let url = document.getElementById('endpoint').getAttribute('value');
         let output = document.getElementById('output');
 
-        fetch(url)
-        .then(function(response){
-          response.json().then(function(data){
-            output.innerText = JSON.stringify(data);
-          })
-          .catch(function(error){
-            output.innerText = error;
+        try{
+          fetch(url)
+          .then(function(response){
+            if(response.status > 399){
+                output.innerText = 'Network error: ' + response.status;
+                return;
+            }
+            response.json().then(function(data){
+              output.innerText = JSON.stringify(data);
+            });
           });
-        })
-        .catch(function(error){
+        } catch(error){
           output.innerText = error;
-        });
+        }
+        
 
       }
 
@@ -119,32 +122,33 @@
         let output = document.getElementById('output');
         let id = window.prompt("Enter Record ID:");
         
+        if(parseInt(id) === Number.NaN){
+          console.log(parseInt(id));
+          output.innerText = 'Network Error: 404';
+          return;
+        }
 
-        if(id !== null && parseInt(id) !== NaN){
+        try{
           fetch(url)
           .then(function(response){
             response.json().then(function(data){
-
+              if(parseInt(id) > data.length || parseInt(id) < 1){
+                output.innerText = 'Network error: 404';
+                return;
+              }
               for(let count = 0; count < data.length; ++count){
                 if(data[count].id == parseInt(id)){
                   output.innerText = JSON.stringify(data[count]);
                   return;
                 }
               }
-
-            })
-            .catch(function(error){
-              output.innerText = error;
             });
-          })
-          .catch(function(error){
-            output.innerText = error;
           });
+        } catch(error){
+          output.innerText = error;
         }
 
-        output.innerText = 'Network Error: 404';
-
-      }
+        }
 
       // This function should use fetch to create one entry in the given endpoint.
       // From the 4 CRUD actions, this is the CREATE action, and uses the POST http method.
@@ -163,24 +167,26 @@
 
           let obj = '{ "title" : "' + title + '", "author": "' + author + '"}';
 
-          function json(response){
-            return response.json();
+          try{
+            fetch(url, {
+              method: 'post',
+              headers: {
+                'Content-type': 'application/json'
+              },
+              body: obj
+            })
+            .then(function(response){
+              if(response.status > 399){
+                output.innerText = 'Network error: ' + response.status;
+                return;
+              }
+              response.json().then(function(data){
+                output.innerText = JSON.stringify(data);
+              });
+            });
+          } catch(error){
+            output.innerText = error;
           }
-
-          fetch(url, {
-            method: 'post',
-            headers: {
-              'Content-type': 'application/json'
-            },
-            body: obj
-          })
-          .then(json)
-          .then(function(data){
-            output.innerText = JSON.stringify(data);
-          })
-          .catch(function(error){
-            output.innerText = 'Error: ' + error;
-          });
 
         }
       }
@@ -204,24 +210,28 @@
 
           let obj = '{ "title" : "' + title + '", "author": "' + author + '"}';
 
-          function json(response){
-            return response.json();
+          try{
+            fetch(url, {
+              method: 'put',
+              headers: {
+                'Content-type': 'application/json'
+              },
+              body: obj
+            })
+            .then(function(response){
+              if(response.status > 399){
+                output.innerText = 'Network error: ' + response.status;
+                return;
+              }
+              response.json().then(function(data){
+                output.innerText = JSON.stringify(data);
+              }); 
+            });
+          } catch(error){
+            output.innerText = error;
           }
-
-          fetch(url, {
-            method: 'put',
-            headers: {
-              'Content-type': 'application/json'
-            },
-            body: obj
-          })
-          .then(json)
-          .then(function(data){
-            output.innerText = JSON.stringify(data);
-          })
-          .catch(function(error){
-            output.innerText = 'Error: ' + error;
-          });
+          
+          
 
         }
       }
@@ -232,7 +242,33 @@
       // request; check the writeup to view the URL pattern for get one and delete. THERE IS NO 
       // delete all, only delete one.
       function deleteRecord() {
-        // TODO
+        document.getElementById('recordIDcontainer').style.display = 'none';
+        document.getElementById('recordForm').style.display = 'none';
+
+        let url = document.getElementById('endpoint').getAttribute('value');
+        let output = document.getElementById('output');
+        let id = window.prompt("Enter Record ID:");
+        url = url + '/' + id
+
+        try{
+          fetch(url, {
+            method: 'delete'
+          })
+          .then(function(response){
+            if(response.status > 399){
+              output.innerText = 'Network error: ' + response.status;
+              return;
+            }
+            response.json().then(function(data){
+              output.innerText = JSON.stringify(data);
+            });
+          });
+        } catch(error){
+          output.innerText = error;
+        }
+        
+        
+        
       }
 
       window.addEventListener('DOMContentLoaded', () => {
